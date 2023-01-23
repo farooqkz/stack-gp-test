@@ -77,7 +77,7 @@ impl Individual {
     }
 }
 
-fn evaluate_stack(stack: &Vec<Instruction>, args: Vec<i32>) -> i32 {
+pub fn evaluate_stack(stack: &Vec<Instruction>, args: Vec<i32>) -> i32 {
     let stack: Vec<Instruction> = {
         let mut new_stack: Vec<Instruction> = args.iter().map(|arg| Instruction::Integer(*arg)).collect();
         let mut old_stack: Vec<Instruction> = stack.to_vec().clone();
@@ -85,32 +85,73 @@ fn evaluate_stack(stack: &Vec<Instruction>, args: Vec<i32>) -> i32 {
         new_stack
     };
     let mut new_stack: Vec<Instruction> = vec![];
-    loop {
-        for (index, item) in stack.iter().enumerate() {
-            match item {
-                Instruction::Duplicate => {
-                    if index > 0 {
-                        new_stack.push(stack[index-1]);
-                        new_stack.push(stack[index-1]);
-                    }
-                },
-                Instruction::Swap => {
-                    if index > 1 {
-                        new_stack.push(stack[index-2]);
-                        new_stack.push(stack[index-1]);
-                    }
-                },
-                _ => { new_stack.push(*item); }
-            }
+    for (index, item) in stack.iter().enumerate() {
+        match item {
+            Instruction::Duplicate => {
+                if index > 0 {
+                    new_stack.push(stack[index-1]);
+                    new_stack.push(stack[index-1]);
+                }
+            },
+            Instruction::Swap => {
+                if index > 1 {
+                    new_stack.push(stack[index-2]);
+                    new_stack.push(stack[index-1]);
+                }
+            },
+            _ => { new_stack.push(*item); }
         }
     }
-    let mut new_stack = loop {
-        let mut stack = new_stack;
-        let mut new_stack: Vec<Instruction> = vec![]; 
-        let mut instruction_seen = false;
-        if !instruction_seen {
-            break new_stack;
+    let mut stack = new_stack;
+    let mut new_stack: Vec<Instruction> = vec![];
+    stack.reverse();
+    let mut instruction_seen = true;
+    while instruction_seen {
+        instruction_seen = false;
+        for (_index, operator) in stack.iter().enumerate() {
+            if let Instruction::Integer(_x) = operator {
+            } else {
+                instruction_seen = true;
+            }
+            match operator {
+                Instruction::Multiply => {
+                    if new_stack.len() >= 2 {
+                        match (new_stack[0], new_stack[1]) {
+                            (Instruction::Integer(x), Instruction::Integer(y)) => {
+                                new_stack.push(Instruction::Integer(x*y));
+                            },
+                            _ => {
+                                new_stack.push(*operator);
+                            }
+                        }
+                    }
+                },
+                Instruction::Sum => {
+                    if new_stack.len() >= 2 {
+                        match (new_stack[1], new_stack[0]) {
+                            (Instruction::Integer(x), Instruction::Integer(y)) => {
+                                new_stack.push(Instruction::Integer(x*y));
+                            },
+                            _ => {
+                                new_stack.push(*operator);
+                            }
+                        }
+                    }
+                },
+               Instruction::Neg => {
+                    if new_stack.len() >= 1 {
+                        if let Some(Instruction::Integer(x)) = new_stack.pop() {
+                            new_stack.push(Instruction::Integer(-x));
+                        } else {
+                            
+                        }
+                    }
+                },
+                _ => { new_stack.push(*operator); }
+            }
         }
+        stack.clear();
+        stack.append(&mut new_stack);
     };
 
     if let Some(Instruction::Integer(x)) = new_stack.pop() {

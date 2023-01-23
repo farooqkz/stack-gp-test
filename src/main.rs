@@ -2,8 +2,10 @@ pub mod genetic;
 pub mod individual;
 pub mod instruction;
 
-use tinyrand::{StdRand};
+use tinyrand::StdRand;
 use clap::{arg, command, Command};
+use crate::individual::evaluate_stack;
+use crate::instruction::Instruction;
 
 fn cli() -> Command {
     command!().args([
@@ -34,7 +36,21 @@ fn main() {
         reproduction_rate: *matches.get_one::<f32>("reproduction").unwrap_or(&0.05),
         cross_over_rate: *matches.get_one::<f32>("crossover").unwrap_or(&0.9),
     };
-    
+    {
+        let mut stack = vec![Instruction::Integer(2), Instruction::Integer(3), Instruction::Sum, Instruction::Integer(2), Instruction::Neg, Instruction::Multiply];
+        println!("Testing evaluate stack function...");
+        assert!(evaluate_stack(&stack, vec![]) == -10);
+        stack.push(Instruction::Duplicate);
+        stack.push(Instruction::Multiply);
+        assert!(evaluate_stack(&stack, vec![]) == 100);
+        stack.push(Instruction::Integer(-1));
+        stack.push(Instruction::Sum);
+        stack.push(Instruction::Swap);
+        assert!(evaluate_stack(&stack, vec![]) == -1);
+        let stack = vec![Instruction::Sum];
+        assert!(evaluate_stack(&stack, vec![2, -2]) == 0);
+        println!("Testing done it's fine :)");
+    }
     let mut rng = StdRand::default();
     let mut g = genetic::Genetic::new(props, &mut rng);
     g.run(200, &dataset, &mut rng);
