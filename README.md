@@ -1,4 +1,4 @@
-# stack genetic programming test
+# stack genetic programming test [WIP]
 
 Trying to implement simple stack genetic programming for symbolic regression.
 
