@@ -78,12 +78,14 @@ impl Individual {
 }
 
 pub fn evaluate_stack(stack: &Vec<Instruction>, args: Vec<i32>) -> i32 {
+    println!("Input without args: {:?}", stack);
     let stack: Vec<Instruction> = {
         let mut new_stack: Vec<Instruction> = args.iter().map(|arg| Instruction::Integer(*arg)).collect();
         let mut old_stack: Vec<Instruction> = stack.to_vec().clone();
         new_stack.append(&mut old_stack);
         new_stack
     };
+    println!("Input with args: {:?}", stack);
     let mut new_stack: Vec<Instruction> = vec![];
     for (index, item) in stack.iter().enumerate() {
         match item {
@@ -103,8 +105,8 @@ pub fn evaluate_stack(stack: &Vec<Instruction>, args: Vec<i32>) -> i32 {
         }
     }
     let mut stack = new_stack;
+    println!("{:?}", stack);
     let mut new_stack: Vec<Instruction> = vec![];
-    stack.reverse();
     let mut instruction_seen = true;
     while instruction_seen {
         instruction_seen = false;
@@ -118,6 +120,8 @@ pub fn evaluate_stack(stack: &Vec<Instruction>, args: Vec<i32>) -> i32 {
                     if new_stack.len() >= 2 {
                         match (new_stack[0], new_stack[1]) {
                             (Instruction::Integer(x), Instruction::Integer(y)) => {
+                                new_stack.pop();
+                                new_stack.pop();
                                 new_stack.push(Instruction::Integer(x*y));
                             },
                             _ => {
@@ -130,7 +134,9 @@ pub fn evaluate_stack(stack: &Vec<Instruction>, args: Vec<i32>) -> i32 {
                     if new_stack.len() >= 2 {
                         match (new_stack[1], new_stack[0]) {
                             (Instruction::Integer(x), Instruction::Integer(y)) => {
-                                new_stack.push(Instruction::Integer(x*y));
+                                new_stack.pop();
+                                new_stack.pop();
+                                new_stack.push(Instruction::Integer(x+y));
                             },
                             _ => {
                                 new_stack.push(*operator);
@@ -154,7 +160,7 @@ pub fn evaluate_stack(stack: &Vec<Instruction>, args: Vec<i32>) -> i32 {
         stack.append(&mut new_stack);
     };
 
-    if let Some(Instruction::Integer(x)) = new_stack.pop() {
+    if let Some(Instruction::Integer(x)) = stack.pop() {
         return x;
     } else {
         return 0;
