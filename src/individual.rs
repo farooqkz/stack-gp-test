@@ -1,20 +1,17 @@
-use tinyrand::{Probability, Rand, RandRange, StdRand};
 use std::collections::VecDeque;
+use tinyrand::{Probability, Rand, RandRange, StdRand};
 
 use crate::instruction::Instruction;
 
-
 pub struct Individual {
-    pub stack: Vec<Instruction>
+    pub stack: Vec<Instruction>,
 }
 
 fn select_random_instruction(rng: &mut StdRand) -> crate::instruction::Instruction {
-    match rng.next_lim_u16(5) {
-        0 => { Instruction::Duplicate },
-        1 => { Instruction::Swap },
-        2 => { Instruction::Neg },
-        3 => { Instruction::Sum },
-        4..=u16::MAX => { Instruction::Multiply },
+    match rng.next_lim_u16(2) {
+        0 => Instruction::Neg,
+        1 => Instruction::Sum,
+        2..=u16::MAX => Instruction::Multiply,
     }
 }
 
@@ -24,22 +21,20 @@ impl Individual {
         for _ in 0..rng.next_range(range_down..range_up) {
             stack.push(select_random_instruction(rng));
         }
-        Individual {
-            stack,
-        }
+        Individual { stack }
     }
 
     pub fn reproduce(&self) -> Self {
         Individual {
-            stack: self.stack.clone()
+            stack: self.stack.clone(),
         }
     }
 
     pub fn crossover(&self, other: &Self, rng: &mut StdRand) -> (Self, Self) {
-        let point = rng.next_lim_u32(self.stack.len() as u32) as usize;
+        let point = rng.next_lim_usize(self.stack.len());
         let mut new0_left = self.stack.clone();
         let new0_right = new0_left.split_off(point);
-        let point = rng.next_lim_u32(other.stack.len() as u32) as usize;
+        let point = rng.next_lim_usize(other.stack.len());
         let mut new1_left = other.stack.clone();
         let new1_right = new1_left.split_off(point);
         let new1 = Individual {
@@ -56,7 +51,7 @@ impl Individual {
     }
 
     pub fn mutate_remove(&mut self) {
-        if self.stack.len() > 0 {
+        if self.stack.len() > 3 {
             self.stack.pop();
         }
     }
@@ -73,39 +68,18 @@ impl Individual {
             let predicted = self.eval(datapoint.to_vec());
             results.push(predicted.abs_diff(actual));
         }
-        results.iter().sum::<u32>() as f32 / results.len() as f32 
+        results.iter().sum::<u32>() as f32 / results.len() as f32
     }
 }
 
 pub fn evaluate_stack(stack: &Vec<Instruction>, args: Vec<i32>) -> i32 {
-    println!("Input without args: {:?}", stack);
-    let stack: Vec<Instruction> = {
-        let mut new_stack: Vec<Instruction> = args.iter().map(|arg| Instruction::Integer(*arg)).collect();
+    let mut stack: Vec<Instruction> = {
+        let mut new_stack: Vec<Instruction> =
+            args.iter().map(|arg| Instruction::Integer(*arg)).collect();
         let mut old_stack: Vec<Instruction> = stack.to_vec().clone();
         new_stack.append(&mut old_stack);
         new_stack
     };
-    println!("Input with args: {:?}", stack);
-    let mut new_stack: Vec<Instruction> = vec![];
-    for (index, item) in stack.iter().enumerate() {
-        match item {
-            Instruction::Duplicate => {
-                if index > 0 {
-                    new_stack.push(stack[index-1]);
-                    new_stack.push(stack[index-1]);
-                }
-            },
-            Instruction::Swap => {
-                if index > 1 {
-                    new_stack.push(stack[index-2]);
-                    new_stack.push(stack[index-1]);
-                }
-            },
-            _ => { new_stack.push(*item); }
-        }
-    }
-    let mut stack = new_stack;
-    println!("{:?}", stack);
     let mut new_stack: Vec<Instruction> = vec![];
     let mut instruction_seen = true;
     while instruction_seen {
@@ -122,43 +96,44 @@ pub fn evaluate_stack(stack: &Vec<Instruction>, args: Vec<i32>) -> i32 {
                             (Instruction::Integer(x), Instruction::Integer(y)) => {
                                 new_stack.pop();
                                 new_stack.pop();
-                                new_stack.push(Instruction::Integer(x*y));
-                            },
+                                new_stack.push(Instruction::Integer(x * y));
+                            }
                             _ => {
                                 new_stack.push(*operator);
                             }
                         }
                     }
-                },
+                }
                 Instruction::Sum => {
                     if new_stack.len() >= 2 {
                         match (new_stack[1], new_stack[0]) {
                             (Instruction::Integer(x), Instruction::Integer(y)) => {
                                 new_stack.pop();
                                 new_stack.pop();
-                                new_stack.push(Instruction::Integer(x+y));
-                            },
+                                new_stack.push(Instruction::Integer(x + y));
+                            }
                             _ => {
                                 new_stack.push(*operator);
                             }
                         }
                     }
-                },
-               Instruction::Neg => {
+                }
+                Instruction::Neg => {
                     if new_stack.len() >= 1 {
                         if let Some(Instruction::Integer(x)) = new_stack.pop() {
                             new_stack.push(Instruction::Integer(-x));
                         } else {
-                            
                         }
                     }
-                },
-                _ => { new_stack.push(*operator); }
+                }
+                _ => {
+                    new_stack.push(*operator);
+                }
             }
         }
         stack.clear();
         stack.append(&mut new_stack);
-    };
+    }
 
     if let Some(Instruction::Integer(x)) = stack.pop() {
         return x;
