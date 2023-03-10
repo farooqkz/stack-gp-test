@@ -1,6 +1,8 @@
-# stack genetic programming test [WIP]
+# stack genetic programming test
 
 Trying to implement simple stack genetic programming for symbolic regression.
+
+Currently, it is mostly single threaded.
 
 ## License
 
