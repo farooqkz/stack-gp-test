@@ -24,7 +24,6 @@ impl Genetic {
         let range_down = props.range_down;
         let range_up = props.range_up;
         let pop = props.population_size;
-        let mut rng = rand::thread_rng();
         Genetic {
             population: (0..pop).into_par_iter()
                 .map(|_| Individual::new(range_up, range_down))
