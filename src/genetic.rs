@@ -1,6 +1,6 @@
-use std::cmp::Ordering;
 use rand::prelude::*;
 use rayon::prelude::*;
+use std::cmp::Ordering;
 
 use crate::individual::Individual;
 
@@ -25,7 +25,8 @@ impl Genetic {
         let range_up = props.range_up;
         let pop = props.population_size;
         Genetic {
-            population: (0..pop).into_par_iter()
+            population: (0..pop)
+                .into_par_iter()
                 .map(|_| Individual::new(range_up, range_down))
                 .collect(),
             props,
@@ -50,21 +51,34 @@ impl Genetic {
             let reproduction_pop = (self.props.reproduction_rate * pop) as usize;
             let addition_mutation_pop = (self.props.addition_mutation_rate * pop) as usize;
             let removal_mutation_pop = (self.props.removal_mutation_rate * pop) as usize;
-            let mut cross_over_offsprings: Vec<Individual> = vec![];
-            while cross_over_offsprings.len() <= cross_over_pop {
-                let r1 = rng.gen_range(0..self.props.population_size);
-                let r2 = rng.gen_range(0..self.props.population_size);
-                let offsprings = self.population[r1].crossover(&self.population[r2]);
-                cross_over_offsprings.push(offsprings.0);
-                cross_over_offsprings.push(offsprings.1);
-            }
-            self.population.par_iter_mut().take(addition_mutation_pop).for_each(|ind| ind.mutate_add());
-            self.population.par_iter_mut().skip(addition_mutation_pop + rng.gen_range(0..(self.props.population_size / 4))).take(removal_mutation_pop).for_each(|ind| ind.mutate_remove());
+            let mut cross_over_offsprings: Vec<Individual> = self
+                .population
+                .par_iter()
+                .zip(self.population.par_iter().rev())
+                .map(|(mother, father)| {
+                    let offsprings = mother.crossover(&father);
+                    return [offsprings.0, offsprings.1];
+                }).take(cross_over_pop / 2).flatten().collect();
+            self.population
+                .par_iter_mut()
+                .skip(addition_mutation_pop + rng.gen_range(0..(self.props.population_size / 4)))
+                .take(removal_mutation_pop)
+                .for_each(|ind| ind.mutate_remove());
+            self.population
+                .par_iter_mut()
+                .take(addition_mutation_pop)
+                .for_each(|ind| ind.mutate_add());
             self.population.append(&mut cross_over_offsprings);
             self.sort_population_by_fitness(dataset);
-            let mut reproduction_pop: Vec<Individual> = self.population.par_iter().take(reproduction_pop).map(|ind| ind.reproduce()).collect();
+            let mut reproduction_pop: Vec<Individual> = self
+                .population
+                .par_iter()
+                .take(reproduction_pop)
+                .map(|ind| ind.reproduce())
+                .collect();
             self.population.append(&mut reproduction_pop);
             println!("{}", g);
+            println!("{:?}", self.population.par_iter().max_by_key(|ind| ind.stack.len()));
         }
     }
 

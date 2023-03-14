@@ -27,11 +27,11 @@ fn main() {
     }
     let matches = cli().get_matches();
     let props = genetic::GeneticProperties {
-        range_up: *matches.get_one::<usize>("rangeup").unwrap_or(&7),
-        range_down: *matches.get_one::<usize>("rangeup").unwrap_or(&2),
+        range_up: *matches.get_one::<usize>("rangeup").unwrap_or(&4),
+        range_down: *matches.get_one::<usize>("rangeup").unwrap_or(&1),
         population_size: *matches.get_one::<usize>("pop").unwrap_or(&1000),
         removal_mutation_rate: *matches.get_one::<f32>("removalmutation").unwrap_or(&0.01),
-        addition_mutation_rate: *matches.get_one::<f32>("additionmutation").unwrap_or(&0.01),
+        addition_mutation_rate: *matches.get_one::<f32>("additionmutation").unwrap_or(&0.005),
         reproduction_rate: *matches.get_one::<f32>("reproduction").unwrap_or(&0.05),
         cross_over_rate: *matches.get_one::<f32>("crossover").unwrap_or(&0.9),
     };

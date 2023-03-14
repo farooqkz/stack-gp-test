@@ -2,13 +2,14 @@ use rand::prelude::*;
 
 use crate::instruction::Instruction;
 
+#[derive(Debug)]
 pub struct Individual {
     pub stack: Vec<Instruction>,
 }
 
 fn select_random_instruction() -> crate::instruction::Instruction {
     let mut rng = rand::thread_rng();
-    match rng.gen_range(0..2) {
+    match rng.gen_range(0..3) {
         0 => Instruction::Neg,
         1 => Instruction::Sum,
         2..=u16::MAX => Instruction::Multiply,
@@ -22,7 +23,7 @@ impl Individual {
         for _ in 0..rng.gen_range(range_down..range_up) {
             stack.push(select_random_instruction());
         }
-        Individual { stack, }
+        Individual { stack }
     }
 
     pub fn reproduce(&self) -> Self {
