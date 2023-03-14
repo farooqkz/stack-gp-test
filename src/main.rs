@@ -5,7 +5,6 @@ pub mod instruction;
 use crate::individual::evaluate_stack;
 use crate::instruction::Instruction;
 use clap::{arg, command, Command};
-use tinyrand::StdRand;
 
 fn cli() -> Command {
     command!().args([
@@ -57,9 +56,8 @@ fn main() {
         assert!(evaluate_stack(&stack, vec![2, -2]) == 0);
         println!("Testing done it's fine :)");
     }
-    let mut rng = StdRand::default();
-    let mut g = genetic::Genetic::new(props, &mut rng);
-    g.run(85, &dataset, &mut rng);
+    let mut g = genetic::Genetic::new(props);
+    g.run(85, &dataset);
     g.sort_population_by_fitness(&dataset);
     println!("{:?}", g.population[0].stack);
     g.sort_population_by_complexity();

@@ -1,5 +1,4 @@
-use std::collections::VecDeque;
-use tinyrand::{Probability, Rand, RandRange, StdRand};
+use rand::prelude::*;
 
 use crate::instruction::Instruction;
 
@@ -7,8 +6,9 @@ pub struct Individual {
     pub stack: Vec<Instruction>,
 }
 
-fn select_random_instruction(rng: &mut StdRand) -> crate::instruction::Instruction {
-    match rng.next_lim_u16(2) {
+fn select_random_instruction() -> crate::instruction::Instruction {
+    let mut rng = rand::thread_rng();
+    match rng.gen_range(0..2) {
         0 => Instruction::Neg,
         1 => Instruction::Sum,
         2..=u16::MAX => Instruction::Multiply,
@@ -16,12 +16,13 @@ fn select_random_instruction(rng: &mut StdRand) -> crate::instruction::Instructi
 }
 
 impl Individual {
-    pub fn new(range_up: usize, range_down: usize, rng: &mut StdRand) -> Self {
+    pub fn new(range_up: usize, range_down: usize) -> Self {
         let mut stack: Vec<Instruction> = vec![];
-        for _ in 0..rng.next_range(range_down..range_up) {
-            stack.push(select_random_instruction(rng));
+        let mut rng = rand::thread_rng();
+        for _ in 0..rng.gen_range(range_down..range_up) {
+            stack.push(select_random_instruction());
         }
-        Individual { stack }
+        Individual { stack, }
     }
 
     pub fn reproduce(&self) -> Self {
@@ -30,11 +31,12 @@ impl Individual {
         }
     }
 
-    pub fn crossover(&self, other: &Self, rng: &mut StdRand) -> (Self, Self) {
-        let point = rng.next_lim_usize(self.stack.len());
+    pub fn crossover(&self, other: &Self) -> (Self, Self) {
+        let mut rng = rand::thread_rng();
+        let point = rng.gen_range(0..self.stack.len());
         let mut new0_left = self.stack.clone();
         let new0_right = new0_left.split_off(point);
-        let point = rng.next_lim_usize(other.stack.len());
+        let point = rng.gen_range(0..other.stack.len());
         let mut new1_left = other.stack.clone();
         let new1_right = new1_left.split_off(point);
         let new1 = Individual {
@@ -46,8 +48,8 @@ impl Individual {
         (new0, new1)
     }
 
-    pub fn mutate_add(&mut self, rng: &mut StdRand) {
-        self.stack.push(select_random_instruction(rng));
+    pub fn mutate_add(&mut self) {
+        self.stack.push(select_random_instruction());
     }
 
     pub fn mutate_remove(&mut self) {
