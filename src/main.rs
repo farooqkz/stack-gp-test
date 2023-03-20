@@ -61,7 +61,7 @@ fn main() {
         println!("Testing done it's fine :)");
     }
     rayon::ThreadPoolBuilder::new()
-        .num_threads(5)
+        .num_threads(0)
         .build_global()
         .unwrap(); // 5 threads because my
                    // laptop has got 4
