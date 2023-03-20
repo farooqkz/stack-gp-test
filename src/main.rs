@@ -52,13 +52,20 @@ fn main() {
         stack.push(Instruction::Integer(-1));
         stack.push(Instruction::Sum);
         assert!(evaluate_stack(&stack, vec![]) == -51);
-        let stack = vec![Instruction::Duplicate, Instruction::Sum, Instruction::Multiply];
+        let stack = vec![
+            Instruction::Duplicate,
+            Instruction::Sum,
+            Instruction::Multiply,
+        ];
         assert!(evaluate_stack(&stack, vec![2, -2]) == -8);
         println!("Testing done it's fine :)");
     }
-    rayon::ThreadPoolBuilder::new().num_threads(5).build_global().unwrap(); // 5 threads because my
-                                                                            // laptop has got 4
-                                                                            // processors(inc. HT)
+    rayon::ThreadPoolBuilder::new()
+        .num_threads(5)
+        .build_global()
+        .unwrap(); // 5 threads because my
+                   // laptop has got 4
+                   // processors(inc. HT)
     let mut g = genetic::Genetic::new(props);
     g.run(200, &dataset);
     g.sort_population_by_fitness(&dataset);

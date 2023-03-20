@@ -106,7 +106,7 @@ pub fn evaluate_stack(stack: &Vec<Instruction>, args: Vec<i32>) -> i32 {
                         let item = operands.iter().take(2).sum();
                         operands.drain(..=1);
                         operands.push_front(item);
-                    } 
+                    }
                 }
                 Instruction::Neg => {
                     if let Some(x) = operands.pop_front() {

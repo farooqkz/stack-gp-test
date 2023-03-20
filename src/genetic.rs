@@ -59,7 +59,9 @@ impl Genetic {
                 .map(|(mother, father)| {
                     let offsprings = mother.crossover(&father);
                     return [offsprings.0, offsprings.1];
-                }).flatten().collect();
+                })
+                .flatten()
+                .collect();
             self.population
                 .par_iter_mut()
                 .skip(addition_mutation_pop + rng.gen_range(0..(self.props.population_size / 4)))
