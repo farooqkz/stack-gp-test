@@ -55,10 +55,11 @@ impl Genetic {
                 .population
                 .par_iter()
                 .zip(self.population.par_iter().rev())
+                .take(cross_over_pop / 2)
                 .map(|(mother, father)| {
                     let offsprings = mother.crossover(&father);
                     return [offsprings.0, offsprings.1];
-                }).take(cross_over_pop / 2).flatten().collect();
+                }).flatten().collect();
             self.population
                 .par_iter_mut()
                 .skip(addition_mutation_pop + rng.gen_range(0..(self.props.population_size / 4)))
@@ -80,7 +81,7 @@ impl Genetic {
             self.sort_population_by_fitness(dataset);
             self.population.drain(self.props.population_size..);
             println!("Gen: {} Pop: {}", g, self.population.len());
-            println!("{:?}", self.population.par_iter().max_by_key(|ind| ind.stack.len()));
+            println!("{:?}", self.population[0]);
         }
     }
 
