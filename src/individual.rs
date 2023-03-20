@@ -38,11 +38,9 @@ impl Individual {
     pub fn crossover(&self, other: &Self) -> (Self, Self) {
         let mut rng = rand::thread_rng();
         let point = rng.gen_range(0..self.stack.len());
-        let mut new0_left = self.stack.clone();
-        let new0_right = new0_left.split_off(point);
+        let (new0_right, new0_left) = self.stack.split_at(point);
         let point = rng.gen_range(0..other.stack.len());
-        let mut new1_left = other.stack.clone();
-        let new1_right = new1_left.split_off(point);
+        let (new1_right, new1_left) = other.stack.split_at(point);
         let new1 = Individual {
             stack: [new0_left, new1_right].concat(),
         };
