@@ -29,7 +29,7 @@ fn main() {
     let props = genetic::GeneticProperties {
         range_up: *matches.get_one::<usize>("rangeup").unwrap_or(&4),
         range_down: *matches.get_one::<usize>("rangeup").unwrap_or(&1),
-        population_size: *matches.get_one::<usize>("pop").unwrap_or(&500),
+        population_size: *matches.get_one::<usize>("pop").unwrap_or(&1000),
         removal_mutation_rate: *matches.get_one::<f32>("removalmutation").unwrap_or(&0.01),
         addition_mutation_rate: *matches.get_one::<f32>("additionmutation").unwrap_or(&0.005),
         reproduction_rate: *matches.get_one::<f32>("reproduction").unwrap_or(&0.05),
@@ -56,8 +56,11 @@ fn main() {
         assert!(evaluate_stack(&stack, vec![2, -2]) == -8);
         println!("Testing done it's fine :)");
     }
+    rayon::ThreadPoolBuilder::new().num_threads(5).build_global().unwrap(); // 5 threads because my
+                                                                            // laptop has got 4
+                                                                            // processors(inc. HT)
     let mut g = genetic::Genetic::new(props);
-    g.run(85, &dataset);
+    g.run(200, &dataset);
     g.sort_population_by_fitness(&dataset);
     println!("{:?}", g.population[0].stack);
     g.sort_population_by_complexity();
