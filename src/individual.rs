@@ -1,5 +1,7 @@
 use rand::prelude::*;
 
+use std::collections::VecDeque;
+
 use crate::instruction::Instruction;
 
 #[derive(Debug)]
@@ -9,10 +11,11 @@ pub struct Individual {
 
 fn select_random_instruction() -> crate::instruction::Instruction {
     let mut rng = rand::thread_rng();
-    match rng.gen_range(0..3) {
+    match rng.gen_range(0..4) {
         0 => Instruction::Neg,
         1 => Instruction::Sum,
-        2..=u16::MAX => Instruction::Multiply,
+        2 => Instruction::Duplicate,
+        3..=u16::MAX => Instruction::Multiply,
     }
 }
 
@@ -83,64 +86,48 @@ pub fn evaluate_stack(stack: &Vec<Instruction>, args: Vec<i32>) -> i32 {
         new_stack.append(&mut old_stack);
         new_stack
     };
-    let mut new_stack: Vec<Instruction> = vec![];
-    let mut instruction_seen = true;
-    while instruction_seen {
-        instruction_seen = false;
-        for (_index, operator) in stack.iter().enumerate() {
-            if let Instruction::Integer(_x) = operator {
-            } else {
-                instruction_seen = true;
-            }
-            match operator {
+    let mut stack: VecDeque<Instruction> = VecDeque::from(stack);
+    let mut operands: VecDeque<i32> = VecDeque::new();
+    while stack.len() > 0 {
+        if let Some(item) = stack.pop_front() {
+            match item {
+                Instruction::Integer(x) => {
+                    operands.push_front(x);
+                }
                 Instruction::Multiply => {
-                    if new_stack.len() >= 2 {
-                        match (new_stack[0], new_stack[1]) {
-                            (Instruction::Integer(x), Instruction::Integer(y)) => {
-                                new_stack.pop();
-                                new_stack.pop();
-                                new_stack.push(Instruction::Integer(x * y));
-                            }
-                            _ => {
-                                new_stack.push(*operator);
-                            }
-                        }
+                    if operands.len() >= 2 {
+                        let item = operands.iter().take(2).product();
+                        operands.drain(..=1);
+                        operands.push_front(item);
                     }
                 }
                 Instruction::Sum => {
-                    if new_stack.len() >= 2 {
-                        match (new_stack[1], new_stack[0]) {
-                            (Instruction::Integer(x), Instruction::Integer(y)) => {
-                                new_stack.pop();
-                                new_stack.pop();
-                                new_stack.push(Instruction::Integer(x + y));
-                            }
-                            _ => {
-                                new_stack.push(*operator);
-                            }
-                        }
-                    }
+                    if operands.len() >= 2 {
+                        let item = operands.iter().take(2).sum();
+                        operands.drain(..=1);
+                        operands.push_front(item);
+                    } 
                 }
                 Instruction::Neg => {
-                    if new_stack.len() >= 1 {
-                        if let Some(Instruction::Integer(x)) = new_stack.pop() {
-                            new_stack.push(Instruction::Integer(-x));
-                        } else {
-                        }
+                    if let Some(x) = operands.pop_front() {
+                        operands.push_front(-x);
                     }
                 }
-                _ => {
-                    new_stack.push(*operator);
+                Instruction::Duplicate => {
+                    if let Some(x) = operands.pop_front() {
+                        operands.push_front(x);
+                        operands.push_front(x);
+                    }
                 }
             }
+        } else {
+            break;
         }
-        stack.clear();
-        stack.append(&mut new_stack);
     }
-
-    if let Some(Instruction::Integer(x)) = stack.pop() {
+    if let Some(x) = operands.pop_back() {
         return x;
     } else {
-        return 0;
+        println!("{:?}", stack);
+        panic!();
     }
 }

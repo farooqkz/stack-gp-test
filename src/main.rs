@@ -29,7 +29,7 @@ fn main() {
     let props = genetic::GeneticProperties {
         range_up: *matches.get_one::<usize>("rangeup").unwrap_or(&4),
         range_down: *matches.get_one::<usize>("rangeup").unwrap_or(&1),
-        population_size: *matches.get_one::<usize>("pop").unwrap_or(&1000),
+        population_size: *matches.get_one::<usize>("pop").unwrap_or(&500),
         removal_mutation_rate: *matches.get_one::<f32>("removalmutation").unwrap_or(&0.01),
         addition_mutation_rate: *matches.get_one::<f32>("additionmutation").unwrap_or(&0.005),
         reproduction_rate: *matches.get_one::<f32>("reproduction").unwrap_or(&0.05),
@@ -52,8 +52,8 @@ fn main() {
         stack.push(Instruction::Integer(-1));
         stack.push(Instruction::Sum);
         assert!(evaluate_stack(&stack, vec![]) == -51);
-        let stack = vec![Instruction::Sum];
-        assert!(evaluate_stack(&stack, vec![2, -2]) == 0);
+        let stack = vec![Instruction::Duplicate, Instruction::Sum, Instruction::Multiply];
+        assert!(evaluate_stack(&stack, vec![2, -2]) == -8);
         println!("Testing done it's fine :)");
     }
     let mut g = genetic::Genetic::new(props);

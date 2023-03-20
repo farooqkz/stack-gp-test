@@ -77,7 +77,9 @@ impl Genetic {
                 .map(|ind| ind.reproduce())
                 .collect();
             self.population.append(&mut reproduction_pop);
-            println!("{}", g);
+            self.sort_population_by_fitness(dataset);
+            self.population.drain(self.props.population_size..);
+            println!("Gen: {} Pop: {}", g, self.population.len());
             println!("{:?}", self.population.par_iter().max_by_key(|ind| ind.stack.len()));
         }
     }
