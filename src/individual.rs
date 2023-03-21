@@ -118,7 +118,7 @@ pub fn evaluate_stack(stack: &Vec<Instruction>, args: &Vec<i32>) -> i32 {
     let stack: Vec<Instruction> = {
         let mut new_stack: Vec<Instruction> =
             args.iter().map(|arg| Instruction::Integer(*arg)).collect();
-        let mut old_stack: Vec<Instruction> = stack.to_vec().clone();
+        let mut old_stack: Vec<Instruction> = stack.clone();
         new_stack.append(&mut old_stack);
         new_stack
     };
