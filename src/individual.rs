@@ -30,7 +30,7 @@ impl Fitness {
             }
         }
         if need_update {
-            self.stack = stack.clone();
+            self.stack.clone_from(stack);
             let mut results: Vec<u32> = vec![];
             for datapoint in dataset.iter() {
                 if let Some(actual) = datapoint.last() {
