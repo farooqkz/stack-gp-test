@@ -34,10 +34,11 @@ impl Genetic {
     }
 
     pub fn sort_population_by_fitness(&mut self, dataset: &Vec<Vec<i32>>) {
+        self.population.par_iter_mut().for_each(|ind| ind.compute_fitness(dataset));
         self.population.par_sort_unstable_by(|ind_a, ind_b| {
             ind_a
-                .fitness(dataset)
-                .partial_cmp(&ind_b.fitness(dataset))
+                .fitness()
+                .partial_cmp(&ind_b.fitness())
                 .unwrap_or(Ordering::Equal)
         });
     }

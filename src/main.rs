@@ -27,11 +27,11 @@ fn main() {
     }
     let matches = cli().get_matches();
     let props = genetic::GeneticProperties {
-        range_up: *matches.get_one::<usize>("rangeup").unwrap_or(&4),
+        range_up: *matches.get_one::<usize>("rangeup").unwrap_or(&6),
         range_down: *matches.get_one::<usize>("rangeup").unwrap_or(&1),
-        population_size: *matches.get_one::<usize>("pop").unwrap_or(&1000),
+        population_size: *matches.get_one::<usize>("pop").unwrap_or(&2000),
         removal_mutation_rate: *matches.get_one::<f32>("removalmutation").unwrap_or(&0.01),
-        addition_mutation_rate: *matches.get_one::<f32>("additionmutation").unwrap_or(&0.005),
+        addition_mutation_rate: *matches.get_one::<f32>("additionmutation").unwrap_or(&0.01),
         reproduction_rate: *matches.get_one::<f32>("reproduction").unwrap_or(&0.05),
         cross_over_rate: *matches.get_one::<f32>("crossover").unwrap_or(&0.9),
     };
@@ -44,32 +44,33 @@ fn main() {
             Instruction::Neg,
             Instruction::Multiply,
         ];
+        let mut args: Vec<i32> = vec![];
         println!("Testing evaluate stack function...");
-        assert!(evaluate_stack(&stack, vec![]) == -10);
+        assert!(evaluate_stack(&stack, &args) == -10);
         stack.push(Instruction::Integer(5));
         stack.push(Instruction::Multiply);
-        assert!(evaluate_stack(&stack, vec![]) == -50);
+        assert!(evaluate_stack(&stack, &args) == -50);
         stack.push(Instruction::Integer(-1));
         stack.push(Instruction::Sum);
-        assert!(evaluate_stack(&stack, vec![]) == -51);
+        assert!(evaluate_stack(&stack, &args) == -51);
         let stack = vec![
             Instruction::Duplicate,
             Instruction::Sum,
             Instruction::Multiply,
         ];
-        assert!(evaluate_stack(&stack, vec![2, -2]) == -8);
+        args.push(2);
+        args.push(-2);
+        assert!(evaluate_stack(&stack, &args) == -8);
         println!("Testing done it's fine :)");
     }
     rayon::ThreadPoolBuilder::new()
         .num_threads(0)
         .build_global()
-        .unwrap(); // 5 threads because my
-                   // laptop has got 4
-                   // processors(inc. HT)
+        .unwrap();
     let mut g = genetic::Genetic::new(props);
-    g.run(200, &dataset);
+    g.run(400, &dataset);
     g.sort_population_by_fitness(&dataset);
-    println!("{:?}", g.population[0].stack);
+    println!("{:?} {:?}", g.population[0].stack, g.population.last());
     g.sort_population_by_complexity();
     println!("{:?}", g.population[0].stack);
 }
