@@ -27,11 +27,11 @@ fn main() {
     }
     let matches = cli().get_matches();
     let props = genetic::GeneticProperties {
-        range_up: *matches.get_one::<usize>("rangeup").unwrap_or(&6),
+        range_up: *matches.get_one::<usize>("rangeup").unwrap_or(&4),
         range_down: *matches.get_one::<usize>("rangeup").unwrap_or(&1),
         population_size: *matches.get_one::<usize>("pop").unwrap_or(&2000),
         removal_mutation_rate: *matches.get_one::<f32>("removalmutation").unwrap_or(&0.01),
-        addition_mutation_rate: *matches.get_one::<f32>("additionmutation").unwrap_or(&0.01),
+        addition_mutation_rate: *matches.get_one::<f32>("additionmutation").unwrap_or(&0.005),
         reproduction_rate: *matches.get_one::<f32>("reproduction").unwrap_or(&0.05),
         cross_over_rate: *matches.get_one::<f32>("crossover").unwrap_or(&0.9),
     };
@@ -70,7 +70,7 @@ fn main() {
     let mut g = genetic::Genetic::new(props);
     g.run(400, &dataset);
     g.sort_population_by_fitness(&dataset);
-    println!("{:?} {:?}", g.population[0].stack, g.population.last());
+    println!("Most fit: {:?}", g.population[0].stack);
     g.sort_population_by_complexity();
-    println!("{:?}", g.population[0].stack);
+    println!("Least complex: {:?}", g.population[0].stack);
 }
