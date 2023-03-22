@@ -18,16 +18,7 @@ impl Fitness {
     }
 
     fn update(&mut self, dataset: &Vec<Vec<i32>>, stack: &Vec<Instruction>) {
-        let mut need_update = self.ft < 0.0;
-        if !need_update {
-            for (this, that) in self.stack.iter().zip(stack.iter()) {
-                if this != that {
-                    need_update = true;
-                    break;
-                }
-            }
-        }
-        if need_update {
+        if self.ft < 0.0 || &self.stack != stack {
             self.stack.clone_from(stack);
             let mut results: Vec<u32> = vec![];
             for datapoint in dataset.iter() {
