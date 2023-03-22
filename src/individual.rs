@@ -152,3 +152,22 @@ pub fn evaluate_stack(stack: &Vec<Instruction>, mut args: Vec<i32>) -> i32 {
         panic!();
     }
 }
+
+#[test]
+fn test_fitness() {
+    let dataset: Vec<Vec<i32>> = (0..100).into_iter()
+        .map(|i| vec![i, i * i + i * i])
+        .collect();
+    let stack = vec![
+        Instruction::Duplicate,
+        Instruction::Sum,
+        Instruction::Multiply,
+    ];
+    let mut individual = Individual::new_from_stack(&stack);
+    individual.compute_fitness(&dataset);
+    let f_1 = individual.fitness();
+    individual.mutate_add();
+    individual.compute_fitness(&dataset);
+    let f_2 = individual.fitness();
+    assert_ne!(f_1, f_2);
+}
