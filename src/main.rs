@@ -44,23 +44,20 @@ fn main() {
             Instruction::Neg,
             Instruction::Multiply,
         ];
-        let mut args: Vec<i32> = vec![];
         println!("Testing evaluate stack function...");
-        assert!(evaluate_stack(&stack, &args) == -10);
+        assert!(evaluate_stack(&stack, vec![]) == -10);
         stack.push(Instruction::Integer(5));
         stack.push(Instruction::Multiply);
-        assert!(evaluate_stack(&stack, &args) == -50);
+        assert!(evaluate_stack(&stack, vec![]) == -50);
         stack.push(Instruction::Integer(-1));
         stack.push(Instruction::Sum);
-        assert!(evaluate_stack(&stack, &args) == -51);
+        assert!(evaluate_stack(&stack, vec![]) == -51);
         let stack = vec![
             Instruction::Duplicate,
             Instruction::Sum,
             Instruction::Multiply,
         ];
-        args.push(2);
-        args.push(-2);
-        assert!(evaluate_stack(&stack, &args) == -8);
+        assert!(evaluate_stack(&stack, vec![2, -2]) == -8);
         println!("Testing done it's fine :)");
     }
     rayon::ThreadPoolBuilder::new()

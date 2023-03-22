@@ -1,7 +1,5 @@
 use rand::prelude::*;
 
-use std::collections::VecDeque;
-
 use crate::instruction::Instruction;
 
 
@@ -34,7 +32,7 @@ impl Fitness {
             let mut results: Vec<u32> = vec![];
             for datapoint in dataset.iter() {
                 if let Some(actual) = datapoint.last() {
-                    let predicted = evaluate_stack(&self.stack, &datapoint);
+                    let predicted = evaluate_stack(&self.stack, datapoint.clone());
                     results.push(predicted.abs_diff(*actual));
                 }
             }
@@ -101,7 +99,7 @@ impl Individual {
         }
     }
 
-    pub fn eval(&self, args: &Vec<i32>) -> i32 {
+    pub fn eval(&self, args: Vec<i32>) -> i32 {
         return evaluate_stack(&self.stack, args);
     }
     
@@ -114,54 +112,41 @@ impl Individual {
     }
 }
 
-pub fn evaluate_stack(stack: &Vec<Instruction>, args: &Vec<i32>) -> i32 {
-    let stack: Vec<Instruction> = {
-        let mut new_stack: Vec<Instruction> =
-            args.iter().map(|arg| Instruction::Integer(*arg)).collect();
-        let mut old_stack: Vec<Instruction> = stack.clone();
-        new_stack.append(&mut old_stack);
-        new_stack
-    };
-    let mut stack: VecDeque<Instruction> = VecDeque::from(stack);
-    let mut operands: VecDeque<i32> = VecDeque::new();
-    while stack.len() > 0 {
-        if let Some(item) = stack.pop_front() {
-            match item {
-                Instruction::Integer(x) => {
-                    operands.push_front(x);
-                }
-                Instruction::Multiply => {
-                    if operands.len() >= 2 {
-                        let item = operands.iter().take(2).product();
-                        operands.drain(..=1);
-                        operands.push_front(item);
-                    }
-                }
-                Instruction::Sum => {
-                    if operands.len() >= 2 {
-                        let item = operands.iter().take(2).sum();
-                        operands.drain(..=1);
-                        operands.push_front(item);
-                    }
-                }
-                Instruction::Neg => {
-                    if let Some(x) = operands.pop_front() {
-                        operands.push_front(-x);
-                    }
-                }
-                Instruction::Duplicate => {
-                    if let Some(x) = operands.pop_front() {
-                        operands.push_front(x);
-                        operands.push_front(x);
-                    }
+pub fn evaluate_stack(stack: &Vec<Instruction>, mut args: Vec<i32>) -> i32 {
+    for item in stack {
+        match item {
+            Instruction::Integer(x) => {
+                args.push(*x);
+            }
+            Instruction::Multiply => {
+                if args.len() >= 2 {
+                    let item = args.pop().unwrap()
+                        .wrapping_mul(args.pop().unwrap());
+                    args.push(item);
                 }
             }
-        } else {
-            break;
+            Instruction::Sum => {
+                if args.len() >= 2 {
+                    let item = args.pop().unwrap()
+                        .wrapping_add(args.pop().unwrap());
+                    args.push(item);
+                }
+            }
+            Instruction::Neg => {
+                if let Some(x) = args.pop() {
+                    args.push(x.wrapping_neg());
+                }
+            }
+            Instruction::Duplicate => {
+                if let Some(x) = args.pop() {
+                    args.push(x);
+                    args.push(x);
+                }
+            }
         }
     }
-    if let Some(x) = operands.pop_back() {
-        return x;
+    if let Some(x) = args.first() {
+        return *x;
     } else {
         println!("{:?}", stack);
         panic!();
