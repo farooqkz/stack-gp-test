@@ -1,6 +1,6 @@
 # stack genetic programming test
 
-This is an exercise to use Stack GP for a simple symbolic regression task.
+This is an exercise to use Stack GP for a simple symbolic regression task. If you want to get familiar with Genetic Programming in a few minutes, read GP.md
 
 ## Crates used
 
@@ -18,7 +18,8 @@ This is an exercise to use Stack GP for a simple symbolic regression task.
 
 ## Since this software is written in Rust, is it idiomatic?
 
-No, not yet. I have just got the thing working and haven't got time to ask Rust community to do a code review for me, yet.
+I've tried but I'm not a Rust expert, yet.
+
 
 
 ## License
