@@ -1,6 +1,6 @@
 ## What is Genetic Programming? [DRAFT]
 
-Genetic Programming can be seen as a branch of Machine Learning where you solve problems by "evolving" a bunch of computer programs to solve a problem. To my knowledge, it was first introduced by John Koza in his book "".
+Genetic Programming can be seen as a branch of Machine Learning where you solve problems by "evolving" a bunch of computer programs to solve a problem. To my knowledge, it was first introduced by John Koza in his book "Genetic Programming: On the programming of computers by means of natural selection".
 
 The principal concepts of Genetic Programming are simple and straightforward:
 
@@ -15,7 +15,7 @@ As you have seen, there is a property, "fitness" which each program has. A fitne
 
 ## What is Stack Genetic Programming?
 
-There are many ways to represent these programs. One of the traditional methods were Tree data structures. Later, a researcher proposued stacks to represent programs. There are many other ways to represent programs, too. For instance, PADO, EP and GNP use something like Graph data structures.
+There are many ways to represent these programs. One of the traditional methods were Tree data structures. Later, [stacks were proposed to represent programs](https://ieeexplore.ieee.org/document/350025/). There are many other ways to represent programs, too. For instance, PADO, EP and GNP use something like Graph data structures.
 
 ## What is Symbolic Regresssion?
 
