@@ -61,7 +61,7 @@ impl Genetic {
             // The population which the operators must be done on them
             self.recompute_fitness_values(dataset);
             total_fitness = self.total_fitness();
-            let mut cross_over_offsprings: Vec<Individual> = self
+            let mut crossover_offsprings: Vec<Individual> = self
                 .population
                 .par_iter()
                 .take(cross_over_pop / 2)
@@ -70,7 +70,8 @@ impl Genetic {
                     let mut rng = rand::thread_rng();
                     let father: &Individual = loop {
                         i = rng.gen_range(0..self.population.len());
-                        if rng.gen_bool(((self.population[i].fitness() + 1.0) / total_fitness) as f64) {
+                        let probability = (self.population[i].fitness() / total_fitness) as f64;
+                        if rng.gen_bool((self.population[i].fitness() / total_fitness) as f64) {
                             break &self.population[i];
                         }
                     };
@@ -88,9 +89,9 @@ impl Genetic {
                 .par_iter_mut()
                 .take(addition_mutation_pop)
                 .for_each(|ind| ind.mutate_add());
-            self.population.append(&mut cross_over_offsprings);
+            self.population.append(&mut crossover_offsprings);
             self.recompute_fitness_values(dataset);
-            let mut total_fitness: f32 = self.total_fitness();
+            total_fitness = self.total_fitness();
             let mut i;
             while self.population.len() > self.props.population_size {
                 i = rng.gen_range(0..self.population.len());
@@ -101,8 +102,8 @@ impl Genetic {
             }
             total_fitness = self.population.par_iter().map(|ind| ind.fitness()).sum();
             self.sort_population_by_fitness(dataset);
-            best_fitness_values.push(self.population[0].fitness() as f64);
-            worst_fitness_values.push(self.population.last().expect("Empty population!").fitness() as f64);
+            worst_fitness_values.push(self.population[0].fitness() as f64);
+            best_fitness_values.push(self.population.last().expect("Empty population!").fitness() as f64);
             avg_fitness_values.push((total_fitness / pop) as f64);
             println!("Gen: {} Pop: {}", g, self.population.len());
         }
@@ -110,7 +111,7 @@ impl Genetic {
     }
     
     fn total_fitness(&self) -> f32 {
-        self.population.par_iter().map(|ind| ind.fitness() + 1.0).sum()
+        self.population.par_iter().map(|ind| ind.fitness()).sum()
     }
 
     pub fn sort_population_by_complexity(&mut self) {

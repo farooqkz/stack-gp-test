@@ -28,14 +28,16 @@ impl Fitness {
         }
         if need_update {
             self.stack.clone_from(stack);
-            let mut results: Vec<u32> = vec![];
+            let mut results: Vec<f32> = vec![];
             for datapoint in dataset.iter() {
-                if let Some(actual) = datapoint.last() {
-                    let predicted = evaluate_stack(&self.stack, datapoint.clone());
-                    results.push(predicted.abs_diff(*actual));
+                let mut datapoint = datapoint.clone();
+                if let Some(actual) = datapoint.pop() {
+                    let actual = actual as f32;
+                    let predicted = evaluate_stack(&self.stack, datapoint) as f32;
+                    results.push((predicted.powi(2) - actual.powi(2)).abs());
                 }
             }
-            self.ft = results.iter().sum::<u32>() as f32 / results.len() as f32;
+            self.ft = results.len() as f32 / (results.iter().sum::<f32>() + 1e-10);
         }
     }
 }

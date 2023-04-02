@@ -57,8 +57,8 @@ fn main() {
     };
     */
     let props = GeneticProperties {
-        population_size: 500,
-        cross_over_rate: 0.6,
+        population_size: 1000,
+        cross_over_rate: 0.8,
         addition_mutation_rate: 0.0075,
         removal_mutation_rate: 0.005,
         range_up: 4,
@@ -112,24 +112,21 @@ fn main() {
         .build_global()
         .unwrap();
     let mut g = Genetic::new(props);
-    println!("{:?}", g.population);
     let graphpoints = g.run(100, &dataset);
     g.sort_population_by_fitness(&dataset);
-    println!("Most fit: {:?}", g.population[0].stack);
+    let fitness: Vec<f32> = g.population.iter().map(|ind| ind.fitness()).collect();
+    println!("{:?}", fitness);
+    g.sort_population_by_fitness(&dataset);
+    println!("Most fit: {:?}", g.population.last().unwrap().stack);
     println!("Let's test some dataset");
     for datapoint in dataset.iter().skip(20).take(8) {
         let i = datapoint.first().unwrap();
         let actual = datapoint.last().unwrap();
-        let ind = &g.population[0];
+        let ind = &g.population.last().unwrap();
         println!("For {}: A {} P {}", i, actual, ind.eval(vec![*i]));
     }
     g.sort_population_by_complexity();
     println!("Least complex: {:?}", g.population[0].stack);
-    /*
-    let graph = rasciigraph::plot_many(
-        graphpoints,
-        rasciigraph::Config::default().with_width(70)
-    );
+    let graph = rasciigraph::plot_many(graphpoints, rasciigraph::Config::default().with_height(40));
     println!("{}", graph);
-    */
 }
