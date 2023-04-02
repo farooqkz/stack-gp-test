@@ -9,3 +9,4 @@ edition = "2021"
 clap = { version = "4.1.1", features = ["cargo"] }
 rayon = "1.7.0"
 rand = "0.8.5"
+rasciigraph = "0.2.0"
