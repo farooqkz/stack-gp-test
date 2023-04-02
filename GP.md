@@ -6,10 +6,9 @@ The principal concepts of Genetic Programming are simple and straightforward:
 
 1. You create a population of random programs which are unfit.
 2. You select a subset of this population, usually a majority of them to "marry" eachother and generate new "offsprings". One method is that the indiviudal with the higher "fitness" will have a better chance of getting married. In this repository, however, this selection is completely random.
-3. You select a subset of this population, usually a minority of them, to reproduce. Usually very "fit" programs(or individuals) will be chosen for reproduction.
-4. You select a few of this population to do small mutations on them.
-5. Discard the most unfit programs among this population to have only as many individuals as we had in Step 1
-6. You repeat the steps through 2 to 5 till some termination condition is met. Usual conditions are based on generation count, time elasped and reaching some pre-defined fitness.
+3. You select a few of this population to do small mutations on them.
+4. You select a subset of this population, equal to population size(which is a hyper parameter), to reproduce. The fitter the individual is, the more chance it will have to reproduce.
+5. You repeat the steps through 2 to 5 till some termination condition is met. Usual conditions are based on generation count, time elasped and reaching some pre-defined fitness.
 
 As you have seen, there is a property, "fitness" which each program has. A fitness is a positive number which indicates how much is a certain program "fit" for the job it is supposed to do. The higher the fitness number is, the better the program is. However too high fitness might mean your programs are "overfit".
 
