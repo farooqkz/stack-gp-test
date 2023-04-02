@@ -2,7 +2,6 @@ use rand::prelude::*;
 
 use crate::instruction::Instruction;
 
-
 #[derive(Debug, Clone)]
 struct Fitness {
     pub ft: f32,
@@ -36,7 +35,7 @@ impl Fitness {
                     results.push(predicted.abs_diff(*actual));
                 }
             }
-            self.ft = results.len() as f32 / results.iter().sum::<u32>() as f32 ;
+            self.ft = results.iter().sum::<u32>() as f32 / results.len() as f32;
         }
     }
 }
@@ -47,7 +46,7 @@ pub struct Individual {
     fitness: Fitness,
 }
 
-fn select_random_instruction() -> crate::instruction::Instruction {
+pub fn select_random_instruction() -> crate::instruction::Instruction {
     let mut rng = rand::thread_rng();
     match rng.gen_range(0..4) {
         0 => Instruction::Neg,
@@ -64,9 +63,12 @@ impl Individual {
         for _ in 0..rng.gen_range(range_down..range_up) {
             stack.push(select_random_instruction());
         }
-        Individual { fitness: Fitness::new(&stack), stack }
+        Individual {
+            fitness: Fitness::new(&stack),
+            stack,
+        }
     }
-    
+
     pub fn new_from_stack(stack: &Vec<Instruction>) -> Self {
         Individual {
             stack: stack.clone(),
@@ -82,8 +84,8 @@ impl Individual {
 
     pub fn crossover(&self, other: &Self) -> (Self, Self) {
         let mut rng = rand::thread_rng();
-        let (new0_right, new0_left) = self.stack.split_at(rng.gen_range(0..self.stack.len()));
-        let (new1_right, new1_left) = other.stack.split_at(rng.gen_range(0..other.stack.len()));
+        let (new0_right, new0_left) = self.stack.split_at(rng.gen_range(1..self.stack.len()));
+        let (new1_right, new1_left) = other.stack.split_at(rng.gen_range(1..other.stack.len()));
         let new1 = Individual::new_from_stack(&[new0_left, new1_right].concat());
         let new0 = Individual::new_from_stack(&[new1_left, new0_right].concat());
         (new0, new1)
@@ -94,15 +96,15 @@ impl Individual {
     }
 
     pub fn mutate_remove(&mut self) {
-        if self.stack.len() > 3 {
+        if self.stack.len() > 2 {
             self.stack.pop();
         }
     }
 
-    pub fn eval(&self, args: Vec<i32>) -> i32 {
+    pub fn eval(&self, mut args: Vec<i32>) -> i32 {
         return evaluate_stack(&self.stack, args);
     }
-    
+
     pub fn compute_fitness(&mut self, dataset: &Vec<Vec<i32>>) {
         self.fitness.update(dataset, &self.stack);
     }
@@ -120,15 +122,13 @@ pub fn evaluate_stack(stack: &Vec<Instruction>, mut args: Vec<i32>) -> i32 {
             }
             Instruction::Multiply => {
                 if args.len() >= 2 {
-                    let item = args.pop().unwrap()
-                        .wrapping_mul(args.pop().unwrap());
+                    let item = args.pop().unwrap().wrapping_mul(args.pop().unwrap());
                     args.push(item);
                 }
             }
             Instruction::Sum => {
                 if args.len() >= 2 {
-                    let item = args.pop().unwrap()
-                        .wrapping_add(args.pop().unwrap());
+                    let item = args.pop().unwrap().wrapping_add(args.pop().unwrap());
                     args.push(item);
                 }
             }
