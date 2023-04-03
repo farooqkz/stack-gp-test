@@ -100,7 +100,7 @@ impl Genetic {
                     self.population.swap_remove(i);
                 }
             }
-            total_fitness = self.population.par_iter().map(|ind| ind.fitness()).sum();
+            total_fitness = self.total_fitness();
             self.sort_population_by_fitness(dataset);
             worst_fitness_values.push(self.population[0].fitness() as f64);
             best_fitness_values.push(self.population.last().expect("Empty population!").fitness() as f64);
