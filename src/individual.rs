@@ -103,8 +103,8 @@ impl Individual {
         }
     }
 
-    pub fn eval(&self, mut args: Vec<i32>) -> i32 {
-        return evaluate_stack(&self.stack, args);
+    pub fn eval(&self, args: Vec<i32>) -> i32 {
+        evaluate_stack(&self.stack, args)
     }
 
     pub fn compute_fitness(&mut self, dataset: &Vec<Vec<i32>>) {
@@ -148,9 +148,9 @@ pub fn evaluate_stack(stack: &Vec<Instruction>, mut args: Vec<i32>) -> i32 {
         }
     }
     if let Some(x) = args.first() {
-        return *x;
+        *x
     } else {
-        println!("{:?}", stack);
+        println!("{stack:?}");
         panic!();
     }
 }

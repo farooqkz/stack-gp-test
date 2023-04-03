@@ -70,13 +70,12 @@ impl Genetic {
                     let mut rng = rand::thread_rng();
                     let father: &Individual = loop {
                         i = rng.gen_range(0..self.population.len());
-                        let probability = (self.population[i].fitness() / total_fitness) as f64;
                         if rng.gen_bool((self.population[i].fitness() / total_fitness) as f64) {
                             break &self.population[i];
                         }
                     };
                     let offsprings = mother.crossover(father);
-                    return [offsprings.0, offsprings.1];
+                    [offsprings.0, offsprings.1]
                 })
                 .flatten()
                 .collect();
@@ -105,7 +104,7 @@ impl Genetic {
             worst_fitness_values.push(self.population[0].fitness() as f64);
             best_fitness_values.push(self.population.last().expect("Empty population!").fitness() as f64);
             avg_fitness_values.push((total_fitness / pop) as f64);
-            println!("Gen: {} Pop: {}", g, self.population.len());
+            println!("Gen: {g}");
         }
         vec![best_fitness_values, avg_fitness_values, worst_fitness_values]
     }

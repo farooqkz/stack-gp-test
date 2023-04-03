@@ -22,7 +22,7 @@ fn cli() -> Command {
 fn main() {
     let mut dataset: Vec<Vec<i32>> = vec![];
     for i in 0..100 {
-        let i = i as i32;
+        let i = i;
         dataset.push([i, i * i + i * i].to_vec());
     }
     let matches = cli().get_matches();
@@ -65,13 +65,13 @@ fn main() {
         range_down: 2,
     };
     if props.removal_mutation_rate < 0.0 {
-        panic!("{}", err_message_f32);
+        panic!("{err_message_f32}");
     }
     if props.addition_mutation_rate < 0.0 {
-        panic!("{}", err_message_f32);
+        panic!("{err_message_f32}");
     }
     if props.cross_over_rate < 0.0 {
-        panic!("{}", err_message_f32);
+        panic!("{err_message_f32}");
     }
     {
         let mut stack = vec![
@@ -115,9 +115,10 @@ fn main() {
     let graphpoints = g.run(100, &dataset);
     g.sort_population_by_fitness(&dataset);
     let fitness: Vec<f32> = g.population.iter().map(|ind| ind.fitness()).collect();
-    println!("{:?}", fitness);
+    println!("{fitness:?}");
     g.sort_population_by_fitness(&dataset);
-    println!("Most fit: {:?}", g.population.last().unwrap().stack);
+    let most_fit = &g.population.last().unwrap().stack;
+    println!("Most fit: {most_fit:?}");
     println!("Let's test some dataset");
     for datapoint in dataset.iter().skip(20).take(8) {
         let i = datapoint.first().unwrap();
@@ -126,7 +127,8 @@ fn main() {
         println!("For {}: A {} P {}", i, actual, ind.eval(vec![*i]));
     }
     g.sort_population_by_complexity();
-    println!("Least complex: {:?}", g.population[0].stack);
+    let least_complex = &g.population[0].stack;
+    println!("Least complex: {least_complex:?}");
     let graph = rasciigraph::plot_many(graphpoints, rasciigraph::Config::default().with_height(40));
-    println!("{}", graph);
+    println!("{graph}");
 }
