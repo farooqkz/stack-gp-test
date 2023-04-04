@@ -7,11 +7,7 @@ use crate::instruction::Instruction;
 use crate::genetic::*;
 
 fn main() {
-    let mut dataset: Vec<Vec<i32>> = vec![];
-    for i in 0..100 {
-        let i = i;
-        dataset.push([i, i * i + i * i].to_vec());
-    }
+    let mut dataset: Vec<Vec<i32>> = (0..100).map(|i| vec![i, 2*i*i]).collect();
     let props = GeneticProperties {
         population_size: 1000,
         cross_over_rate: 0.8,
