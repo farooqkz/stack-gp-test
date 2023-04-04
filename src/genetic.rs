@@ -93,13 +93,14 @@ impl Genetic {
             total_fitness = self.total_fitness();
             let mut i;
             while self.population.len() > self.props.population_size {
-                i = rng.gen_range(0..self.population.len());
-                let probability = 1.0 - (self.population[i].fitness() / total_fitness);
+                i = rng.gen_range(0..self.population.len() - 1);
+                let fitness = self.population[i].fitness();
+                let probability = 1.0 - (fitness / total_fitness);
                 if rng.gen_bool(probability as f64) {
                     self.population.swap_remove(i);
+                    total_fitness -= fitness;
                 }
             }
-            total_fitness = self.total_fitness();
             self.sort_population_by_fitness(dataset);
             worst_fitness_values.push(self.population[0].fitness() as f64);
             best_fitness_values.push(self.population.last().expect("Empty population!").fitness() as f64);
