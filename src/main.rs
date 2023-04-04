@@ -5,19 +5,6 @@ pub mod instruction;
 use crate::individual::*;
 use crate::instruction::Instruction;
 use crate::genetic::*;
-use clap::{arg, command, Command};
-
-fn cli() -> Command {
-    command!().args([
-        arg!(--rangeup <VALUE> "Maximum size of initial program"),
-        arg!(--rangedown <VALUE> "Minimum size of initial program"),
-        arg!(--pop <VALUE> "Size of population"),
-        arg!(--gen <VALUE> "Number of generations"),
-        arg!(--crossover <VALUE> "Crossover rate"),
-        arg!(--additionmutation <VALUE> "Addition mutation rate"),
-        arg!(--removalmutation <VALUE> "Removal mutation rate"),
-    ])
-}
 
 fn main() {
     let mut dataset: Vec<Vec<i32>> = vec![];
@@ -25,37 +12,6 @@ fn main() {
         let i = i;
         dataset.push([i, i * i + i * i].to_vec());
     }
-    let matches = cli().get_matches();
-    let err_message_usize = "Invalid base 10 positive integer";
-    let err_message_f32 = "Invalid positive float";
-    /*
-    let props = genetic::GeneticProperties {
-        range_up: usize::from_str_radix(*matches.get_one::<String>("rangeup"), 10)
-            .expect(err_message_usize),
-        range_down: usize::from_str_radix(*matches.get_one::<String>("rangeup").unwrap_or(&"1"), 10)
-            .expect(err_message_usize),
-        population_size: usize::from_str_radix(
-            *matches.get_one::<String>("pop").unwrap_or(&"3000"),
-            10,
-        )
-        .expect(err_message_usize),
-        removal_mutation_rate: matches
-            .get_one::<String>("removalmutation")
-            .unwrap_or(&"0.01")
-            .parse::<f32>()
-            .expect(err_message_f32),
-        addition_mutation_rate: matches
-            .get_one::<String>("additionmutation")
-            .unwrap_or(&"0.005")
-            .parse::<f32>()
-            .expect(err_message_f32),
-        cross_over_rate: matches
-            .get_one::<String>("crossover")
-            .unwrap_or("0.9")
-            .parse::<f32>()
-            .expect(err_message_f32),
-    };
-    */
     let props = GeneticProperties {
         population_size: 1000,
         cross_over_rate: 0.8,
@@ -64,15 +20,6 @@ fn main() {
         range_up: 4,
         range_down: 2,
     };
-    if props.removal_mutation_rate < 0.0 {
-        panic!("{err_message_f32}");
-    }
-    if props.addition_mutation_rate < 0.0 {
-        panic!("{err_message_f32}");
-    }
-    if props.cross_over_rate < 0.0 {
-        panic!("{err_message_f32}");
-    }
     {
         let mut stack = vec![
             Instruction::Integer(2),
@@ -108,7 +55,7 @@ fn main() {
         println!("{:?}", select_random_instruction());
     }
     rayon::ThreadPoolBuilder::new()
-        .num_threads(0)
+        .num_threads(0) // 0 means rayon will decide number of threads
         .build_global()
         .unwrap();
     let mut g = Genetic::new(props);
