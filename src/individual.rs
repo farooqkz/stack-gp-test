@@ -17,16 +17,7 @@ impl Fitness {
     }
 
     fn update(&mut self, dataset: &Vec<Vec<i32>>, stack: &Vec<Instruction>) {
-        let mut need_update = self.ft < 0.0;
-        if !need_update {
-            for (this, that) in self.stack.iter().zip(stack.iter()) {
-                if this != that {
-                    need_update = true;
-                    break;
-                }
-            }
-        }
-        if need_update {
+        if self.ft < 0.0 || &self.stack != stack {
             self.stack.clone_from(stack);
             let mut results: Vec<f32> = vec![];
             for datapoint in dataset.iter() {
@@ -153,4 +144,23 @@ pub fn evaluate_stack(stack: &Vec<Instruction>, mut args: Vec<i32>) -> i32 {
         println!("{stack:?}");
         panic!();
     }
+}
+
+#[test]
+fn test_fitness() {
+    let dataset: Vec<Vec<i32>> = (0..100).into_iter()
+        .map(|i| vec![i, i * i + i * i])
+        .collect();
+    let stack = vec![
+        Instruction::Duplicate,
+        Instruction::Sum,
+        Instruction::Multiply,
+    ];
+    let mut individual = Individual::new_from_stack(&stack);
+    individual.compute_fitness(&dataset);
+    let f_1 = individual.fitness();
+    individual.mutate_add();
+    individual.compute_fitness(&dataset);
+    let f_2 = individual.fitness();
+    assert_ne!(f_1, f_2);
 }
